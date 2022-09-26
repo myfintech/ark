@@ -1,0 +1,849 @@
+---
+{
+   "apiVersion": "policy/v1beta1",
+   "kind": "PodDisruptionBudget",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-server"
+   },
+   "spec": {
+      "maxUnavailable": 0,
+      "selector": {
+         "matchLabels": {
+            "app": "consul",
+            "component": "server"
+         }
+      }
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "ServiceAccount",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-client-svc-account"
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "ServiceAccount",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-server-svc-account"
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "ServiceAccount",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-connect-injector-webhook-svc-account"
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "data": {
+      "central-config.json": "{\"enable_central_service_config\": true}",
+      "extra-from-values.json": "{ }"
+   },
+   "kind": "ConfigMap",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-client-config"
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "data": {
+      "central-config.json": "{\"enable_central_service_config\": true}",
+      "extra-from-values.json": "{ }",
+      "proxy-defaults-config.json": "{\"config_entries\": {\"bootstrap\": [{\"config\": {\"envoy_dogstatsd_url\": \"udp://127.0.0.1:9125\"}, \"kind\": \"proxy-defaults\", \"name\": \"global\"}]}}"
+   },
+   "kind": "ConfigMap",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-server-config"
+   }
+}
+---
+{
+   "apiVersion": "rbac.authorization.k8s.io/v1",
+   "kind": "ClusterRole",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-client"
+   },
+   "rules": [ ]
+}
+---
+{
+   "apiVersion": "rbac.authorization.k8s.io/v1",
+   "kind": "ClusterRoleBinding",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-client"
+   },
+   "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "ClusterRole",
+      "name": "consul-client"
+   },
+   "subjects": [
+      {
+         "apiGroup": "",
+         "kind": "ServiceAccount",
+         "name": "consul-client-svc-account",
+         "namespace": "consul"
+      }
+   ]
+}
+---
+{
+   "apiVersion": "rbac.authorization.k8s.io/v1",
+   "kind": "ClusterRole",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-server"
+   },
+   "rules": [ ]
+}
+---
+{
+   "apiVersion": "rbac.authorization.k8s.io/v1",
+   "kind": "ClusterRoleBinding",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-server"
+   },
+   "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "ClusterRole",
+      "name": "consul-server-svc-account"
+   },
+   "subjects": [
+      {
+         "apiGroup": "",
+         "kind": "ServiceAccount",
+         "name": "consul-server",
+         "namespace": "consul"
+      }
+   ]
+}
+---
+{
+   "apiVersion": "rbac.authorization.k8s.io/v1",
+   "kind": "ClusterRole",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-connect-injector-webhook"
+   },
+   "rules": [
+      {
+         "apiGroups": [
+            "admissionregistration.k8s.io"
+         ],
+         "resources": [
+            "mutatingwebhookconfigurations"
+         ],
+         "verbs": [
+            "get",
+            "list",
+            "watch",
+            "patch"
+         ]
+      }
+   ]
+}
+---
+{
+   "apiVersion": "rbac.authorization.k8s.io/v1",
+   "kind": "ClusterRoleBinding",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul"
+   },
+   "roleRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "kind": "ClusterRole",
+      "name": "consul-connect-injector-webhook"
+   },
+   "subjects": [
+      {
+         "apiGroup": "",
+         "kind": "ServiceAccount",
+         "name": "consul-connect-injector-webhook-svc-account",
+         "namespace": "consul"
+      }
+   ]
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "Service",
+   "metadata": {
+      "annotations": { },
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-connect-injector-svc"
+   },
+   "spec": {
+      "ports": [
+         {
+            "port": 443,
+            "targetPort": 8080
+         }
+      ],
+      "selector": {
+         "app": "consul",
+         "component": "connect-injector"
+      },
+      "type": "ClusterIP"
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "Service",
+   "metadata": {
+      "annotations": {
+         "service.alpha.kubernetes.io/tolerate-unready-endpoints": "true"
+      },
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-server"
+   },
+   "spec": {
+      "clusterIP": "None",
+      "ports": [
+         {
+            "name": "http",
+            "port": 8500,
+            "targetPort": 8500
+         },
+         {
+            "name": "serflan-tcp",
+            "port": 8301,
+            "protocol": "TCP",
+            "targetPort": 8301
+         },
+         {
+            "name": "serflan-udp",
+            "port": 8301,
+            "protocol": "UDP",
+            "targetPort": 8301
+         },
+         {
+            "name": "serfwan-tcp",
+            "port": 8302,
+            "protocol": "TCP",
+            "targetPort": 8302
+         },
+         {
+            "name": "serfwan-udp",
+            "port": 8302,
+            "protocol": "UDP",
+            "targetPort": 8301
+         },
+         {
+            "name": "server",
+            "port": 8300,
+            "targetPort": 8300
+         },
+         {
+            "name": "dns-tcp",
+            "port": 8600,
+            "protocol": "TCP",
+            "targetPort": "dns-tcp"
+         },
+         {
+            "name": "dns-udp",
+            "port": 8600,
+            "protocol": "UDP",
+            "targetPort": "dns-udp"
+         }
+      ],
+      "publishNotReadyAddresses": true,
+      "selector": {
+         "app": "consul",
+         "component": "server"
+      },
+      "type": "ClusterIP"
+   }
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "Service",
+   "metadata": {
+      "annotations": { },
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-ui"
+   },
+   "spec": {
+      "ports": [
+         {
+            "name": "http",
+            "port": 80,
+            "targetPort": 8500
+         }
+      ],
+      "selector": {
+         "app": "consul",
+         "component": "server"
+      },
+      "type": "ClusterIP"
+   }
+}
+---
+{
+   "apiVersion": "apps/v1",
+   "kind": "DaemonSet",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul"
+   },
+   "spec": {
+      "selector": {
+         "matchLabels": {
+            "app": "consul",
+            "component": "client",
+            "hasDNS": "true"
+         }
+      },
+      "template": {
+         "metadata": {
+            "annotations": {
+               "consul.hashicorp.com/connect-inject": "false"
+            },
+            "labels": {
+               "app": "consul",
+               "component": "client",
+               "hasDNS": "true"
+            }
+         },
+         "spec": {
+            "affinity": { },
+            "containers": [
+               {
+                  "args": [ ],
+                  "command": [
+                     "/bin/sh",
+                     "-ec",
+                     "CONSUL_FULLNAME=\"consul\"\n\nexec /bin/consul agent \\\n  -node=\"${NODE}\" \\\n  -advertise=\"${ADVERTISE_IP}\" \\\n  -bind=0.0.0.0 \\\n  -client=0.0.0.0 \\\n  -node-meta=pod-name:${HOSTNAME} \\\n  -hcl=\"leave_on_terminate = true\" \\\n  -hcl=\"ports { grpc = 8502 }\" \\\n  -config-dir=/consul/config \\\n  -datacenter=dc1 \\\n  -data-dir=/consul/data \\\n  -retry-join=\"${CONSUL_FULLNAME}-server-0.${CONSUL_FULLNAME}-server.${NAMESPACE}.svc\" \\\n  -domain=consul\n"
+                  ],
+                  "env": [
+                     {
+                        "name": "ADVERTISE_IP",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "status.podIP"
+                           }
+                        }
+                     },
+                     {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "metadata.namespace"
+                           }
+                        }
+                     },
+                     {
+                        "name": "NODE",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "spec.nodeName"
+                           }
+                        }
+                     },
+                     {
+                        "name": "HOST_IP",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "status.hostIP"
+                           }
+                        }
+                     }
+                  ],
+                  "envFrom": [ ],
+                  "image": "consul:1.7.2",
+                  "imagePullPolicy": "IfNotPresent",
+                  "name": "consul",
+                  "ports": [
+                     {
+                        "containerPort": 8500,
+                        "hostPort": 8500,
+                        "name": "http"
+                     },
+                     {
+                        "containerPort": 8502,
+                        "hostPort": 8502,
+                        "name": "grpc"
+                     },
+                     {
+                        "containerPort": 8301,
+                        "name": "serflan-tcp",
+                        "protocol": "TCP"
+                     },
+                     {
+                        "containerPort": 8301,
+                        "name": "serflan-udp",
+                        "protocol": "UDP"
+                     },
+                     {
+                        "containerPort": 8302,
+                        "name": "serfwan"
+                     },
+                     {
+                        "containerPort": 8300,
+                        "name": "server"
+                     },
+                     {
+                        "containerPort": 8600,
+                        "name": "dns-tcp",
+                        "protocol": "TCP"
+                     },
+                     {
+                        "containerPort": 8600,
+                        "name": "dns-udp",
+                        "protocol": "UDP"
+                     }
+                  ],
+                  "readinessProbe": {
+                     "exec": {
+                        "command": [
+                           "/bin/sh",
+                           "-ec",
+                           "curl http://127.0.0.1:8500/v1/status/leader \\\n2>/dev/null | grep -E \"\".+\"\"\n"
+                        ]
+                     }
+                  },
+                  "volumeMounts": [
+                     {
+                        "mountPath": "/consul/data",
+                        "name": "data"
+                     },
+                     {
+                        "mountPath": "/consul/config",
+                        "name": "config"
+                     }
+                  ]
+               }
+            ],
+            "hostNetwork": false,
+            "imagePullSecrets": [ ],
+            "initContainers": [ ],
+            "nodeSelector": { },
+            "restartPolicy": "Always",
+            "serviceAccountName": "consul-client-svc-account",
+            "terminationGracePeriodSeconds": 10,
+            "volumes": [
+               {
+                  "emptyDir": { },
+                  "name": "data"
+               },
+               {
+                  "configMap": {
+                     "name": "consul-client-config"
+                  },
+                  "name": "config"
+               }
+            ]
+         }
+      },
+      "updateStrategy": {
+         "rollingUpdate": {
+            "maxUnavailable": 1
+         },
+         "type": "RollingUpdate"
+      }
+   }
+}
+---
+{
+   "apiVersion": "apps/v1",
+   "kind": "StatefulSet",
+   "metadata": {
+      "annotations": { },
+      "labels": {
+         "app": "consul",
+         "component": "server"
+      },
+      "name": "consul-server"
+   },
+   "spec": {
+      "podManagementPolicy": "Parallel",
+      "replicas": 1,
+      "selector": {
+         "matchLabels": {
+            "app": "consul",
+            "component": "server",
+            "hasDNS": "true"
+         }
+      },
+      "serviceName": "consul-server",
+      "template": {
+         "metadata": {
+            "annotations": {
+               "consul.hashicorp.com/connect-inject": "false"
+            },
+            "labels": {
+               "app": "consul",
+               "component": "server",
+               "hasDNS": "true"
+            }
+         },
+         "spec": {
+            "affinity": {
+               "podAntiAffinity": {
+                  "requiredDuringSchedulingIgnoredDuringExecution": [
+                     {
+                        "labelSelector": {
+                           "matchLabels": {
+                              "app": "consul",
+                              "component": "server"
+                           }
+                        },
+                        "topologyKey": "kubernetes.io/hostname"
+                     }
+                  ]
+               }
+            },
+            "containers": [
+               {
+                  "args": [ ],
+                  "command": [
+                     "/bin/sh",
+                     "-ec",
+                     "CONSUL_FULLNAME=\"consul\"\n\nexec /bin/consul agent \\\n  -advertise=\"${POD_IP}\" \\\n  -bind=0.0.0.0 \\\n  -bootstrap-expect=1 \\\n  -client=0.0.0.0 \\\n  -config-dir=/consul/config \\\n  -datacenter=dc1 \\\n  -data-dir=/consul/data \\\n  -domain=consul \\\n  -hcl=\"connect { enabled = true }\" \\\n  -ui \\\n  -retry-join=${CONSUL_FULLNAME}-server-0.${CONSUL_FULLNAME}-server.${NAMESPACE}.svc \\\n  -server\n"
+                  ],
+                  "env": [
+                     {
+                        "name": "POD_IP",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "status.podIP"
+                           }
+                        }
+                     },
+                     {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "metadata.namespace"
+                           }
+                        }
+                     }
+                  ],
+                  "envFrom": [ ],
+                  "image": "consul:1.7.2",
+                  "imagePullPolicy": "IfNotPresent",
+                  "lifecycle": {
+                     "preStop": {
+                        "exec": {
+                           "command": [
+                              "/bin/sh",
+                              "-c",
+                              "consul leave"
+                           ]
+                        }
+                     }
+                  },
+                  "name": "consul-server",
+                  "ports": [
+                     {
+                        "containerPort": 8500,
+                        "name": "http"
+                     },
+                     {
+                        "containerPort": 8301,
+                        "name": "serflan"
+                     },
+                     {
+                        "containerPort": 8302,
+                        "name": "serfwan"
+                     },
+                     {
+                        "containerPort": 8300,
+                        "name": "server"
+                     },
+                     {
+                        "containerPort": 8600,
+                        "name": "dns-tcp",
+                        "protocol": "TCP"
+                     },
+                     {
+                        "containerPort": 8600,
+                        "name": "dns-udp",
+                        "protocol": "UDP"
+                     }
+                  ],
+                  "readinessProbe": {
+                     "exec": {
+                        "command": [
+                           "/bin/sh",
+                           "-ec",
+                           "curl http://127.0.0.1:8500/v1/status/leader \\\n2>/dev/null | grep -E \"\".+\"\"\n"
+                        ]
+                     },
+                     "failureThreshold": 2,
+                     "initialDelaySeconds": 5,
+                     "periodSeconds": 3,
+                     "successThreshold": 1,
+                     "timeoutSeconds": 5
+                  },
+                  "volumeMounts": [
+                     {
+                        "mountPath": "/consul/data",
+                        "name": "data"
+                     },
+                     {
+                        "mountPath": "/consul/config",
+                        "name": "config"
+                     }
+                  ]
+               }
+            ],
+            "hostNetwork": false,
+            "imagePullSecrets": [ ],
+            "initContainers": [ ],
+            "nodeSelector": { },
+            "restartPolicy": "Always",
+            "securityContext": {
+               "fsGroup": 1000
+            },
+            "serviceAccountName": "consul-server-svc-account",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+               {
+                  "configMap": {
+                     "name": "consul-server-config"
+                  },
+                  "name": "config"
+               }
+            ]
+         }
+      },
+      "volumeClaimTemplates": [
+         {
+            "metadata": {
+               "name": "data"
+            },
+            "spec": {
+               "accessModes": [
+                  "ReadWriteOnce"
+               ],
+               "resources": {
+                  "requests": {
+                     "storage": "10Gi"
+                  }
+               }
+            }
+         }
+      ]
+   }
+}
+---
+{
+   "apiVersion": "apps/v1",
+   "kind": "Deployment",
+   "metadata": {
+      "annotations": { },
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-connect-injector-webhook-deployment"
+   },
+   "spec": {
+      "replicas": 1,
+      "selector": {
+         "matchLabels": {
+            "app": "consul",
+            "component": "connect-injector"
+         }
+      },
+      "strategy": {
+         "type": "RollingUpdate"
+      },
+      "template": {
+         "metadata": {
+            "annotations": {
+               "consul.hashicorp.com/connect-inject": "false"
+            },
+            "labels": {
+               "app": "consul",
+               "component": "connect-injector"
+            }
+         },
+         "spec": {
+            "affinity": { },
+            "containers": [
+               {
+                  "args": [ ],
+                  "command": [
+                     "/bin/sh",
+                     "-ec",
+                     "CONSUL_FULLNAME=\"consul\"\n\nconsul-k8s inject-connect \\\n  -default-inject=true \\\n  -consul-image=\"consul:1.7.2\" \\\n  -consul-k8s-image=\"hashicorp/consul-k8s:0.14.0\" \\\n  -listen=:8080 \\\n  -enable-central-config=true \\\n  -default-protocol=\"http\" \\\n  -allow-k8s-namespace=\"*\" \\\n  -tls-auto=${CONSUL_FULLNAME}-connect-injector-cfg \\\n  -tls-auto-hosts=${CONSUL_FULLNAME}-connect-injector-svc,${CONSUL_FULLNAME}-connect-injector-svc.${NAMESPACE},${CONSUL_FULLNAME}-connect-injector-svc.${NAMESPACE}.svc\n"
+                  ],
+                  "env": [
+                     {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                           "fieldRef": {
+                              "fieldPath": "metadata.namespace"
+                           }
+                        }
+                     }
+                  ],
+                  "envFrom": [ ],
+                  "image": "hashicorp/consul-k8s:0.14.0",
+                  "imagePullPolicy": "IfNotPresent",
+                  "livenessProbe": {
+                     "failureThreshold": 2,
+                     "httpGet": {
+                        "path": "/health/ready",
+                        "port": 8080,
+                        "scheme": "HTTPS"
+                     },
+                     "initialDelaySeconds": 1,
+                     "periodSeconds": 2,
+                     "successThreshold": 1,
+                     "timeoutSeconds": 5
+                  },
+                  "name": "sidecar-injector",
+                  "ports": [ ],
+                  "readinessProbe": {
+                     "failureThreshold": 2,
+                     "httpGet": {
+                        "path": "/health/ready",
+                        "port": 8080,
+                        "scheme": "HTTPS"
+                     },
+                     "initialDelaySeconds": 2,
+                     "periodSeconds": 2,
+                     "successThreshold": 1,
+                     "timeoutSeconds": 5
+                  },
+                  "volumeMounts": [ ]
+               }
+            ],
+            "hostNetwork": false,
+            "imagePullSecrets": [ ],
+            "initContainers": [ ],
+            "nodeSelector": { },
+            "restartPolicy": "Always",
+            "serviceAccountName": "consul-connect-injector-webhook-svc-account",
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [ ]
+         }
+      }
+   }
+}
+---
+{
+   "apiVersion": "admissionregistration.k8s.io/v1beta1",
+   "kind": "MutatingWebhookConfiguration",
+   "metadata": {
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-connect-injector-cfg"
+   },
+   "webhooks": [
+      {
+         "clientConfig": {
+            "caBundle": "",
+            "service": {
+               "name": "consul-connect-injector-svc",
+               "namespace": "consul",
+               "path": "/mutate"
+            }
+         },
+         "name": "consul-connect-injector.consul.hashicorp.com",
+         "rules": [
+            {
+               "apiGroups": [
+                  ""
+               ],
+               "apiVersions": [
+                  "v1"
+               ],
+               "operations": [
+                  "CREATE"
+               ],
+               "resources": [
+                  "pods"
+               ]
+            }
+         ]
+      }
+   ]
+}
+---
+{
+   "apiVersion": "v1",
+   "kind": "Service",
+   "metadata": {
+      "annotations": { },
+      "labels": {
+         "app": "consul"
+      },
+      "name": "consul-dns"
+   },
+   "spec": {
+      "ports": [
+         {
+            "name": "dns-tcp",
+            "port": 53,
+            "protocol": "TCP",
+            "targetPort": "dns-tcp"
+         },
+         {
+            "name": "dns-udp",
+            "port": 53,
+            "protocol": "UDP",
+            "targetPort": "dns-udp"
+         }
+      ],
+      "selector": {
+         "app": "consul",
+         "hasDNS": "true"
+      },
+      "type": "ClusterIP"
+   }
+}

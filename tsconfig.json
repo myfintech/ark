@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "lib": [
+      "esnext"
+    ],
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": true,
+    "noImplicitAny": true,
+    "baseUrl": "./",
+    "paths": {
+      "arksdk": [
+        ".ark/types/arksdk",
+        "src/go/lib/ark/embeds/.ark/types/arksdk"
+      ],
+      "arksdk/*": [
+        ".ark/types/arksdk/*",
+        "src/go/lib/ark/embeds/.ark/types/arksdk/*"
+      ],
+      "ark": [
+        ".ark/types/ark",
+        "src/go/lib/ark/embeds/.ark/types/ark"
+      ],
+      "ark/*": [
+        ".ark/types/ark/*"
+      ],
+      "ark/external": [
+        ".ark/external_modules"
+      ],
+      "ark/external/*": [
+        ".ark/external_modules/*"
+      ],
+      "ark/native": [
+        ".ark/native_modules"
+      ],
+      "ark/native/*": [
+        ".ark/native_modules/*"
+      ],
+      "ark/plugins": [
+        ".ark/types/ark/plugins",
+        "src/go/lib/ark/embeds/.ark/types/ark/plugins"
+      ],
+      "ark/plugins/*": [
+        ".ark/types/ark/plugins/*",
+        "src/go/lib/ark/embeds/.ark/types/ark/plugins/*"
+      ]
+    },
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}

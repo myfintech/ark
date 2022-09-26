@@ -1,0 +1,8 @@
+FROM gcr.io/managed-infrastructure/mantl/golang:alpine
+
+RUN apk update
+RUN apk upgrade
+RUN apk add ca-certificates && update-ca-certificates
+RUN apk add --update git
+RUN rm -rf /var/cache/apk/*
+RUN go get -u github.com/go-delve/delve/cmd/dlv

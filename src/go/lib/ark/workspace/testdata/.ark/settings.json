@@ -1,0 +1,24 @@
+{
+  "kubernetes": {
+    "safe_contexts": [
+      "development_sre"
+    ],
+    "namespace": "test-namespace"
+  },
+  "vault": {
+    "address": "https://vault.mantl.team",
+    "encryption_key": "mantl-key"
+  },
+  "file_system": {
+    "ignore": [
+      "test"
+    ]
+  },
+  "plugins": [
+    {
+      "name": "test",
+      "image": "gcr.io"
+    }
+  ],
+  "disable_version_check": true
+}

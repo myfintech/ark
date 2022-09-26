@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="arkcliv2 run" type="GoApplicationRunConfiguration" factoryName="Go Application" singleton="false">
+    <module name="mantl" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="run src/go/lib/arkplugins/cicd-gha-runner/build.ts bin " />
+    <EXTENSION ID="net.ashald.envfile">
+      <option name="IS_ENABLED" value="false" />
+      <option name="IS_SUBST" value="false" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="false" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+      </ENTRIES>
+    </EXTENSION>
+    <kind value="PACKAGE" />
+    <package value="github.com/myfintech/mantl/src/go/tools/arkcliv2" />
+    <directory value="$PROJECT_DIR$/" />
+    <filePath value="$PROJECT_DIR$/src/go/tools/arkcliv2/main.go" />
+    <method v="2" />
+  </configuration>
+</component>

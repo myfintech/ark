@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="Core Proxy Local" uuid="93f0262a-d17e-4567-9954-e7f3a5761f08">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Production Admin (SRE)" group="StrongDM (SRE)" uuid="01976fe2-df37-48c2-8575-2bc6991c6764">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:15441/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Integration Admin (SRE)" group="StrongDM (SRE)" uuid="d51abc76-a672-4ff8-b09c-1fa2d6c63446">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:15439/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="UAT Admin (SRE)" group="StrongDM (SRE)" uuid="dafab101-74ff-4aeb-8243-e7932c0f855e">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:15440/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Radius Data Warehousing" group="Radius Data Warehousing" uuid="d2317051-ca4a-48e2-a35c-bd8c93165025">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:15438/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="AWS Radius DW" group="Radius Data Warehousing" uuid="496ed1c8-d47a-4195-aaf1-b855953844c1">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://dw-radius.cfbgnq7ugor2.us-east-1.rds.amazonaws.com:5454/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Production Radius Admin (SRE)" group="StrongDM (SRE)" uuid="f246d3f9-6710-49d1-b4de-c4f45c93dfba">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:15442/postgres</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="db" uuid="9ad3792e-98b2-44d7-ada5-0a937d84a686">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db.sqlite</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.34.0/sqlite-jdbc-3.34.0.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="db [2]" uuid="ea9413c7-7fea-458c-b522-4af3633caf68">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/src/go/services/tinkerbell-cerberus/db.sqlite</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.34.0/sqlite-jdbc-3.34.0.jar</url>
+        </library>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.34.0/sqlite-jdbc-3.34.0.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="filetransferlocal" uuid="a52ff675-446d-48ed-a7c7-b3b9c49fbb2c">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/file_transfer</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>

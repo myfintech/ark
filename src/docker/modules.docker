@@ -1,0 +1,10 @@
+FROM ${from} as build
+
+ENV CGO_ENABLED=0
+
+WORKDIR /opt/app
+COPY ./ ./
+
+%{ for cmd in commands ~}
+RUN ${cmd}
+%{ endfor ~}

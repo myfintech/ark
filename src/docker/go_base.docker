@@ -1,0 +1,44 @@
+FROM gcr.io/managed-infrastructure/mantl/golang:alpine as builder
+
+RUN apk update && apk upgrade && apk add --no-cache ca-certificates git
+RUN update-ca-certificates
+
+ARG SERVICE_NAME
+ARG BUILD_COMMAND
+ARG START_COMMAND
+ARG APP_BASE=/opt/app
+ARG SERVICE_LIB=src/go/lib
+ARG SERVICE_DIR=src/go/services/${SERVICE_NAME}
+
+ENV BUILD_COMMAND ${BUILD_COMMAND}
+ENV START_COMMAND ${START_COMMAND}
+ENV SERVICE_NAME ${SERVICE_NAME}
+ENV APP_BASE ${APP_BASE}
+
+WORKDIR ${APP_BASE}
+RUN go get github.com/derekparker/delve/cmd/dlv
+COPY go.mod ${APP_BASE}/go.mod
+COPY ${SERVICE_DIR} ${APP_BASE}/${SERVICE_DIR}
+COPY ${SERVICE_LIB} ${APP_BASE}/${SERVICE_LIB}
+
+RUN go mod download
+RUN go mod vendor
+
+ENV GOOS linux
+ENV GOARCH amd64
+ENV CGO_ENABLED 0
+ENV GO111MODULE on
+
+# RUN ${BUILD_COMMAND}
+
+ENTRYPOINT ${START_COMMAND}
+
+## Build production image
+#FROM scratch as production
+#ARG APP_BASE=/opt/app
+#ENV APP_BASE ${APP_BASE}
+#WORKDIR ${APP_BASE}
+#COPY --from=builder ${APP_BASE}/main /main
+#COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+#ENTRYPOINT /main
+#CMD ""

@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package host_server;
+
+// working name for the package - this is what will tie the CLI to other components, acting as the central source of information
+option go_package = ".;host_server";
+
+service Host {
+  rpc CleanHostArtifacts(CleanHostArtifactsRequest) returns (CleanHostArtifactsResponse) {}
+  rpc PullArtifacts(PullArtifactsRequest) returns (stream LogStreamResponse) {}
+  rpc PushArtifacts(PushArtifactsRequest) returns (stream LogStreamResponse) {}
+
+  rpc ListTargets(ListTargetsRequest) returns (ListTargetsResponse) {}
+  rpc RunTarget(RunTargetRequest) returns (stream LogStreamResponse) {}
+
+  rpc AddWorkspace(AddWorkspaceRequest) returns (AddWorkspaceResponse) {}
+  rpc ValidateWorkspace(ValidateWorkspaceRequest) returns (ValidateWorkspaceResponse) {}
+  rpc WatchWorkspace(WatchWorkspaceRequest) returns (stream LogStreamResponse) {}
+
+  rpc Shutdown(ShutdownRequest) returns (ShutdownResponse) {}
+}
+
+// used for all log streams
+message LogStreamResponse {
+  bytes data = 1;
+}
+
+// used for aggregating target information
+message Target {
+  string address = 1;
+  string short_hash = 2;
+  string hash = 3;
+  bool locally_cached = 4;
+  bool remotely_cached = 5;
+  string description = 6;
+}
+
+// ark add workspace -- does not exist yet
+message AddWorkspaceRequest {
+  string root = 1;
+}
+message AddWorkspaceResponse {}
+
+// ark clean
+message CleanHostArtifactsRequest {}
+message CleanHostArtifactsResponse {}
+
+// ark targets list
+message ListTargetsRequest {
+  string root = 1; // workspace root
+  bool check_remote_cache = 2;
+}
+message ListTargetsResponse {
+  repeated Target targets = 1;
+}
+
+// ark artifacts pull
+message PullArtifactsRequest {
+  string root = 1; // workspace root
+}
+
+// ark artifacts push
+message PushArtifactsRequest {
+  string root = 1; // workspace root
+}
+
+// debug commands don't really make sense in their current state
+// debug lookup_target doesn't lookup targets, it dumps the look-up table in its entirety
+// debug target only outputs source files for a target, and while that is useful information since we're doing globbing, it seems incomplete
+
+// ark run
+message RunTargetRequest {
+  string root = 1; // workspace root
+  string address = 2;
+  bool force = 3;
+  bool push = 4;
+  bool pull = 5;
+  bool watch = 6;
+  bool stop_on_first_error = 7;
+  string args = 8;
+}
+
+// ark shutdown -- does not exist yet
+message ShutdownRequest {}
+message ShutdownResponse {}
+
+// ark validate workspace -- does not exist yet
+message ValidateWorkspaceRequest {
+  string root = 1;
+}
+message ValidateWorkspaceResponse {}
+
+// ark watch -- does not exist yet
+message WatchWorkspaceRequest {
+  string root = 1;
+}

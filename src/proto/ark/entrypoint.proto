@@ -1,0 +1,33 @@
+syntax = "proto3";
+package entrypoint;
+
+option go_package = ".;entrypoint";
+
+message Action {
+  repeated string command = 1;
+  string workdir = 2;
+  repeated string patterns = 3;
+}
+
+message FileChangeNotification {
+  repeated File files = 1;
+  bytes archive = 2;
+  string root = 3;
+  repeated Action actions = 4;
+}
+
+message FileChangeAck {}
+
+message File {
+  string name = 1;
+  bool exists = 2;
+  bool new = 3;
+  string type = 4;
+  string hash = 5;
+  string symlink_target = 6;
+  string rel_name = 7;
+}
+
+service Sync {
+  rpc StreamFileChange(stream FileChangeNotification) returns (stream FileChangeAck) {}
+}

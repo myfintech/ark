@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="sftp-transfer-service" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="mantl" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="run" />
+    <envs>
+      <env name="VAULT_ENV" value="development" />
+      <env name="LOG_FORMAT" value="json" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="github.com/myfintech/mantl/src/go/services/sftp-transfer" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/src/go/services/sftp-transfer/main.go" />
+    <method v="2" />
+  </configuration>
+</component>

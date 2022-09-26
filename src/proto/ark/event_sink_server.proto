@@ -1,0 +1,26 @@
+syntax = "proto3";
+package event_sink_server;
+
+option go_package = ".;event_sink_server";
+
+message CanonicalEvent {
+  string org_id = 1;
+  string project_id = 2;
+  string event_id = 3;
+  string user_id = 4;
+  string verb = 5;
+  string method = 6;
+  string os = 7;
+  string version = 8;
+  string tracker_version = 9;
+  string metadata = 10;
+  string created_at = 11;
+}
+
+message RecordCanonicalEventResponse {
+  bool ok = 1;
+}
+
+service EventSink {
+  rpc RecordCanonicalEvent(CanonicalEvent) returns (RecordCanonicalEventResponse) {}
+}
