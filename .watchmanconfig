@@ -1,0 +1,19 @@
+{
+  "ignore_dirs": [
+    ".cache",
+    ".buildkite",
+    ".github",
+    ".git",
+    ".idea",
+    ".vscode",
+    "build",
+    "deployment",
+    "dist",
+    "docker",
+    "hygen",
+    "node_modules",
+    "coverage",
+    "reports",
+    "stack"
+  ]
+}

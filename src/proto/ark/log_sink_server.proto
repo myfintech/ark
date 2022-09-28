@@ -1,0 +1,21 @@
+syntax = "proto3";
+package log_sink_server;
+
+option go_package = ".;log_sink_server";
+
+message LogLine {
+  string user_id = 1;
+  string target_address = 2;
+  string target_hash = 3;
+  bytes data = 4;
+  string created_at = 5;
+  string received_at = 6;
+  string org_id = 7;
+  string project_id = 8;
+}
+
+message RecordLogLineAck {}
+
+service LogSink {
+  rpc Record(stream LogLine) returns (stream RecordLogLineAck) {}
+}

@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+download_for_linux () {
+  curl --fail --fail-early -Lo ark ${download_url}/arkcli-linux
+  install ark /usr/local/bin/
+  rm ark
+}
+
+download_for_darwin () {
+  curl --fail --fail-early -Lo ark ${download_url}/arkcli-darwin
+  install ark /usr/local/bin/
+  rm ark
+}
+
+main() {
+    # the double dollar sign is used to escape and preserve this the templating of the download URL
+    if [[ $( id -u ) == "0" ]] && [[ -z "$${CI}" ]]
+    then
+        echo "please DO NOT run this script with sudo"
+        exit 1
+    fi
+
+    case "$(uname -s).$(uname -m)" in
+        Linux.x86_64) download_for_linux;;
+        Darwin.x86_64) download_for_darwin && /usr/local/bin/ark setup;;
+        *) echo "sorry, there is no binary distribution of Ark for your platform"; exit 1;;
+    esac
+}
+
+main "$@"

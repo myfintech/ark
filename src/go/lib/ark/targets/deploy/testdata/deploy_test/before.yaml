@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-test-deployment
+  labels:
+    app: deploy-test
+spec:
+  selector:
+    matchLabels:
+      app: deploy-test
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: deploy-test
+    spec:
+      containers:
+        - name: deploy-test
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "250m"
+            requests:
+              memory: 128Mi
+              cpu: "80m"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: deploy-test
+  name: deploy-test-ds
+spec:
+  selector:
+    matchLabels:
+      app: deploy-test
+  template:
+    metadata:
+      labels:
+        app: deploy-test
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 8081
+              hostPort: 8081
+              name: http
+              protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: deploy-test-ss
+  labels:
+    app: deploy-test
+spec:
+  serviceName: deploy-test
+  selector:
+    matchLabels:
+      app: deploy-test
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: deploy-test
+    spec:
+      containers:
+        - name: deploy-test-ss
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+              name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy-test
+spec:
+  selector:
+    app: deploy-test
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

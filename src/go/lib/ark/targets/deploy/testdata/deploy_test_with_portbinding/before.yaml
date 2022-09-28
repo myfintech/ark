@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-test-portbinding-deployment
+  labels:
+    app: deploy-test-portbinding
+spec:
+  selector:
+    matchLabels:
+      app: deploy-test-portbinding
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: deploy-test-portbinding
+    spec:
+      containers:
+        - name: deploy-test-portbinding
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: "250m"
+            requests:
+              memory: 128Mi
+              cpu: "80m"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: deploy-test-portbinding
+  name: deploy-test-portbinding-ds
+spec:
+  selector:
+    matchLabels:
+      app: deploy-test-portbinding
+  template:
+    metadata:
+      labels:
+        app: deploy-test-portbinding
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 8081
+              hostPort: 8082
+              name: http
+              protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: deploy-test-portbinding-ss
+  labels:
+    app: deploy-test-portbinding
+spec:
+  serviceName: deploy-test-portbinding
+  selector:
+    matchLabels:
+      app: deploy-test-portbinding
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: deploy-test-portbinding
+    spec:
+      containers:
+        - name: deploy-test-portbinding-ss
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+              name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy-test-portbinding
+spec:
+  selector:
+    app: deploy-test-portbinding
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

@@ -1,0 +1,5 @@
+{
+  "name": "ark",
+  "version": "0.0.1-rc.36",
+  "version_check_endpoint": "https://[cdn-domain]/assets/ark/version.json"
+}

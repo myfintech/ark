@@ -1,0 +1,36 @@
+FROM ${modules} as modules
+FROM ${from} as build
+WORKDIR /opt/app
+COPY --from=modules /go/pkg/mod /go/pkg/mod
+COPY --from=modules /opt/app /opt/app
+
+COPY ./ ./
+
+ENV CGO_ENABLED=0
+%{ for cmd in run_commands ~}
+RUN ${cmd}
+%{ endfor ~}
+
+%{ if length(try(copy_commands, [])) > 0 }
+  %{ for copy in copy_commands ~}
+    %{ if try(copy.image, "") != "" }
+FROM ${copy.image} as ${copy.from}
+    %{ endif }
+  %{ endfor ~}
+%{ endif }
+
+FROM alpine:latest as release
+RUN apk update && apk add bind-tools
+
+# Go 1.15 introduced breaking changes to the use of certificate common name fields without SANS
+# https://jfrog.com/knowledge-base/general-what-should-i-do-if-i-get-an-x509-certificate-relies-on-legacy-common-name-field-error/
+ENV GODEBUG "x509ignoreCN=0"
+
+COPY --from=build /usr/local/bin/${binary} /usr/local/bin/${binary}
+%{ if length(try(copy_commands, [])) > 0 }
+  %{ for copy in copy_commands ~}
+COPY --from=${copy.from} ${copy.src} ${copy.dest}
+  %{ endfor ~}
+%{ endif }
+ENTRYPOINT ["${binary}"]
+CMD ${start_command_args}

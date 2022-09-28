@@ -1,0 +1,4 @@
+FROM ${from} as build
+%{ for cmd in run_commands ~}
+RUN ${cmd}
+%{ endfor }

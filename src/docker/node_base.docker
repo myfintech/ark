@@ -1,0 +1,38 @@
+FROM node:10 as builder
+
+ARG SERVICE_NAME
+ARG SERVICE_LANGUAGE=js
+ARG APP_BASE=/opt/app
+ARG SERVICE_LIB=src/${SERVICE_LANGUAGE}/lib
+ARG SERVICE_DIR=src/${SERVICE_LANGUAGE}/services/${SERVICE_NAME}
+
+ENV SERVICE_NAME ${SERVICE_NAME}
+
+WORKDIR ${APP_BASE}
+
+COPY nodemon.json ${APP_BASE}/nodemon.json
+COPY tsconfig.json ${APP_BASE}/tsconfig.json
+COPY package.json ${APP_BASE}/package.json
+COPY ${SERVICE_DIR} ${APP_BASE}/${SERVICE_DIR}
+COPY ${SERVICE_LIB} ${APP_BASE}/${SERVICE_LIB}
+
+# Install the workspaces
+RUN yarn install
+
+FROM node:10-alpine
+# We must redefine all arguments
+# When using multi-stage builds
+ARG COMMAND
+ARG SERVICE_NAME
+ARG SERVICE_LANGUAGE=js
+ARG APP_BASE=/opt/app
+ARG SERVICE_LIB=src/${SERVICE_LANGUAGE}/lib
+ARG SERVICE_DIR=src/${SERVICE_LANGUAGE}/services/${SERVICE_NAME}
+
+ENV SERVICE_NAME ${SERVICE_NAME}
+ENV START_COMMAND ${COMMAND}
+ENV PATH=${PATH}:${APP_BASE}/node_modules/.bin
+
+WORKDIR ${APP_BASE}
+COPY --from=builder ${APP_BASE} ${APP_BASE}
+CMD ${START_COMMAND}

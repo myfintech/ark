@@ -1,0 +1,38 @@
+.idea
+vendor
+node_modules
+.env
+*.env
+*.log
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+bin
+dist
+build
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# ignore playgound stuff
+src/go/playground/**/
+
+# Files with user specific paths
+/src/dev/tilt.json
+
+# Unignore special directories
+!/src/go/lib/arksdk/target/build/
+/db.sqlite
+
+# k8s manifests generated for testing
+**/testdata/**/manifest.yaml
+/.ark/db.sqlite

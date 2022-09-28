@@ -1,0 +1,24 @@
+{
+  "kubernetes": {
+    "safe_contexts": [
+      "development"
+    ],
+    "namespace": "test-namespace"
+  },
+  "vault": {
+    "address": "https://vault",
+    "encryption_key": "key"
+  },
+  "file_system": {
+    "ignore": [
+      "test"
+    ]
+  },
+  "plugins": [
+    {
+      "name": "test",
+      "image": "gcr.io"
+    }
+  ],
+  "disable_version_check": true
+}

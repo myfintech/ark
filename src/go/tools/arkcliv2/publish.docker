@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1.3-labs
+FROM ${arkcliArtifactURL} as arkbin
+FROM ${pkmArtifactURL} as pkmbin
+FROM alpine as upload
+
+# Set working directory
+WORKDIR /opt/upload
+
+# copy ark binary files from artifact image
+COPY --from=arkbin /arkcliv2-* /opt/upload/
+COPY --from=pkmbin /package-manager-linux /usr/local/bin/package-manager
+
+ENV GOOGLE_APPLICATION_CREDENTIALS /run/secrets/${serviceAccountSecret}
+
+# mount secret from arks secret store
+# activate that secret as the service account
+#
+RUN --mount=type=secret,id=${serviceAccountSecret} <<EOF \
+package-manager upload \
+    --bucket ${bucket} \
+    --bucket.prefix ${prefix} \
+    --version ${version} \
+    --package=os=darwin,arch=amd64,file=/opt/upload/arkcliv2-darwin \
+    --package=os=linux,arch=amd64,file=/opt/upload/arkcliv2-linux
+EOF
